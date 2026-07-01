@@ -655,7 +655,7 @@
    void PageTranslated(std::string_view source_lang,
 --- a/chrome/browser/ui/cocoa/renderer_context_menu/render_view_context_menu_mac.mm
 +++ b/chrome/browser/ui/cocoa/renderer_context_menu/render_view_context_menu_mac.mm
-@@ -4,15 +4,24 @@
+@@ -4,15 +4,25 @@
  
  #include "chrome/browser/ui/cocoa/renderer_context_menu/render_view_context_menu_mac.h"
  
