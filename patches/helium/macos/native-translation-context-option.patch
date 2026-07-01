@@ -23,7 +23,7 @@
      "renderer_context_menu/render_view_context_menu_mac.mm",
      "renderer_context_menu/render_view_context_menu_mac_cocoa.mm",
      "renderer_context_menu/render_view_context_menu_mac_remote_cocoa.mm",
-@@ -149,9 +153,11 @@ source_set("cocoa") {
+@@ -153,9 +153,11 @@ source_set("cocoa") {
      "//chrome/browser/profiles:profile_manager",
      "//chrome/browser/profiles:profile_util",
      "//chrome/browser/profiles/keep_alive",
@@ -32,10 +32,10 @@
      "//chrome/browser/status_icons",
      "//chrome/browser/themes",
 +    "//chrome/browser/translate",
+     "//chrome/browser/ui:accelerator_utils_headers",
+     "//chrome/browser/ui:simple_message_box_headers",
      "//chrome/browser/ui:ui_features",
-     "//chrome/browser/ui/autofill",
-     "//chrome/browser/ui/bookmarks",
-@@ -176,7 +182,9 @@ source_set("cocoa") {
+@@ -182,7 +184,9 @@ source_set("cocoa") {
      "//components/startup_metric_utils",
      "//components/tab_groups",
      "//components/tabs",
@@ -538,23 +538,23 @@
    E(kActionContentContextLanguageSettings, \
 --- a/chrome/browser/renderer_context_menu/render_view_context_menu.cc
 +++ b/chrome/browser/renderer_context_menu/render_view_context_menu.cc
-@@ -603,13 +603,14 @@ const std::map<int, int>& GetIdcToUmaMap
-        {IDC_CONTENT_CONTEXT_GLIC, 162},
-        {IDC_CONTENT_CONTEXT_VIDEO_FRAME, 163},
+@@ -617,13 +617,14 @@ const std::map<int, int>& GetIdcToUmaMap
         {IDC_CONTENT_CONTEXT_LISTEN_TO_THIS_PAGE, 164},
-+       {IDC_CONTENT_CONTEXT_SYSTEM_TRANSLATE, 165},
+        {IDC_CONTENT_CONTEXT_DICTATION, 165},
+        {IDC_CONTENT_CONTEXT_ADD_LINK_TO_READING_LIST, 166},
++       {IDC_CONTENT_CONTEXT_SYSTEM_TRANSLATE, 167},
         // To add new items:
         //   - Add one more line above this comment block, using the UMA value
         //     from the line below this comment block.
         //   - Increment the UMA value in that latter line.
         //   - Add the new item to the RenderViewContextMenuItem enum in
         //     tools/metrics/histograms/metadata/ui/enums.xml.
--       {0, 165}});
-+       {0, 166}});
+-       {0, 167}});
++       {0, 168}});
    // LINT.ThenChange(//tools/metrics/histograms/metadata/ui/enums.xml:RenderViewContextMenuItem)
  
    // LINT.IfChange(ContextMenuOptionDesktop)
-@@ -648,13 +649,14 @@ const std::map<int, int>& GetIdcToUmaMap
+@@ -662,13 +663,14 @@ const std::map<int, int>& GetIdcToUmaMap
         {IDC_CONTENT_CONTEXT_SEARCHWEBFORNEWTAB, 29},
         {IDC_CONTENT_CONTEXT_OPENLINKSPLITVIEW, 31},
         {IDC_CONTENT_CONTEXT_GLICSHAREIMAGE, 32},
@@ -580,11 +580,11 @@
  </enum>
  
  <!-- LINT.ThenChange(//chrome/browser/renderer_context_menu/render_view_context_menu.cc:ContextMenuOptionDesktop) -->
-@@ -363,6 +364,7 @@ chromium-metrics-reviews@google.com.
-   <int value="162" label="IDC_CONTENT_CONTEXT_GLIC"/>
-   <int value="163" label="IDC_CONTENT_CONTEXT_VIDEO_FRAME"/>
+@@ -367,6 +368,7 @@ chromium-metrics-reviews@google.com.
    <int value="164" label="IDC_CONTENT_CONTEXT_LISTEN_TO_THIS_PAGE"/>
-+  <int value="165" label="IDC_CONTENT_CONTEXT_SYSTEM_TRANSLATE"/>
+   <int value="165" label="IDC_CONTENT_CONTEXT_DICTATION"/>
+   <int value="166" label="IDC_CONTENT_CONTEXT_ADD_LINK_TO_READING_LIST"/>
++  <int value="167" label="IDC_CONTENT_CONTEXT_SYSTEM_TRANSLATE"/>
  </enum>
  
  <!-- LINT.ThenChange(//chrome/browser/renderer_context_menu/render_view_context_menu.cc:RenderViewContextMenuItem) -->
@@ -655,7 +655,7 @@
    void PageTranslated(std::string_view source_lang,
 --- a/chrome/browser/ui/cocoa/renderer_context_menu/render_view_context_menu_mac.mm
 +++ b/chrome/browser/ui/cocoa/renderer_context_menu/render_view_context_menu_mac.mm
-@@ -4,16 +4,25 @@
+@@ -4,15 +4,24 @@
  
  #include "chrome/browser/ui/cocoa/renderer_context_menu/render_view_context_menu_mac.h"
  
@@ -669,7 +669,6 @@
 +#include "chrome/browser/search/search.h"
 +#include "chrome/browser/translate/translate_service.h"
 +#include "chrome/browser/ui/cocoa/renderer_context_menu/native_translation_context_menu_mac.h"
- #include "chrome/grit/generated_resources.h"
 +#include "components/translate/core/browser/translate_manager.h"
 +#include "components/translate/core/browser/translate_prefs.h"
  #include "content/public/browser/render_frame_host.h"
