@@ -1,0 +1,20 @@
+--- a/chrome/browser/ui/views/tabs/sidetree/sidetree_tab_row_view_unittest.cc
++++ b/chrome/browser/ui/views/tabs/sidetree/sidetree_tab_row_view_unittest.cc
+@@ -345,6 +345,9 @@ TEST_F(SideTreeTabRowViewTest, UpdateStateRefreshesShowingHoverCard) {
+   EXPECT_EQ(delegate.last_hover_card_update_type,
+             TabSlotController::HoverCardUpdateType::kTabDataChanged);
+   ASSERT_TRUE(std::holds_alternative<TabCardData>(row->data()));
+   EXPECT_EQ(std::get<TabCardData>(row->data()).title_data.text,
+             u"New hover title");
++
++  delegate.last_hover_card_target = nullptr;
++  delegate.hover_card_showing_target = nullptr;
+ }
+@@ -367,5 +370,7 @@ TEST_F(SideTreeTabRowViewTest, UpdateStateHidesShowingHoverCardWhenDisabled) {
+   EXPECT_EQ(delegate.hover_card_update_count, 1);
+   EXPECT_EQ(delegate.last_hover_card_target, nullptr);
+   EXPECT_EQ(delegate.last_hover_card_update_type,
+             TabSlotController::HoverCardUpdateType::kEvent);
++
++  delegate.hover_card_showing_target = nullptr;
+ }
