@@ -669,6 +669,7 @@
 +#include "chrome/browser/search/search.h"
 +#include "chrome/browser/translate/translate_service.h"
 +#include "chrome/browser/ui/cocoa/renderer_context_menu/native_translation_context_menu_mac.h"
++#include "chrome/grit/generated_resources.h"
 +#include "components/translate/core/browser/translate_manager.h"
 +#include "components/translate/core/browser/translate_prefs.h"
  #include "content/public/browser/render_frame_host.h"
