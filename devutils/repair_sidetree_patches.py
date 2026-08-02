@@ -201,6 +201,11 @@ def repair_native_tab_tree(contents: str) -> str:
             "HoverCardAnchorTarget comment context",
         ),
         (
+            '+    "//components/tabs",',
+            '+    "//components/tabs:public",',
+            "SideTree unit-test tabs dependency",
+        ),
+        (
             "   resize_area_->SetVisible(!collapsed ||",
             "   UpdateResizeAreaVisibility();",
             "OnCollapseStateChanged resize helper context",
