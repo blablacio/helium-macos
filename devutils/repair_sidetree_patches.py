@@ -50,6 +50,45 @@ def replace_hunk_exactly_once(
     )
 
 
+def replace_hunk_sequence_exactly_once(
+    contents: str, old_headers: tuple[str, ...], new_hunk: str, description: str
+) -> str:
+    """Replace adjacent unified-diff hunks with one current-context hunk."""
+    new_hunk = new_hunk.replace("\n<CONTEXT-BLANK>\n", "\n \n")
+    old_counts = tuple(contents.count(header) for header in old_headers)
+    new_header = new_hunk.partition("\n")[0]
+    new_count = contents.count(new_header)
+
+    if all(count == 1 for count in old_counts) and new_count == 0:
+        starts = tuple(contents.index(header) for header in old_headers)
+        if starts != tuple(sorted(starts)):
+            raise RuntimeError(
+                f"cannot repair {description}: source hunks are out of order"
+            )
+
+        start = starts[0]
+        last_start = starts[-1]
+        end_candidates = [
+            position
+            for marker in ("\n@@ ", "\n--- ")
+            if (
+                position := contents.find(
+                    marker, last_start + len(old_headers[-1])
+                )
+            )
+            >= 0
+        ]
+        end = min(end_candidates, default=len(contents))
+        return contents[:start] + new_hunk.rstrip("\n") + contents[end:]
+    if all(count == 0 for count in old_counts) and new_count == 1:
+        return contents
+
+    raise RuntimeError(
+        f"cannot repair {description}: "
+        f"found source hunks {old_counts} and repaired hunk {new_count} times"
+    )
+
+
 def repair_native_tab_polish(contents: str) -> str:
     repairs = (
         (
@@ -327,25 +366,17 @@ def repair_vertical_strip_native_shell(contents: str) -> str:
 
 
 def repair_native_tab_bridge(contents: str) -> str:
-    hunks = (
-        (
-            "@@ -42,6 +42,7 @@",
-            """@@ -49,6 +49,7 @@
- #include "chrome/browser/ui/views/tabs/common/tab_strip_view.h"
- #include "chrome/browser/ui/views/tabs/common/tab_view.h"
- #include "chrome/browser/ui/views/tabs/common/unpinned_tab_container_view.h"
- #include "chrome/browser/ui/views/tabs/shared/drop_arrow.h"
-+#include "chrome/browser/ui/views/tabs/sidetree/sidetree_tab_strip_view.h"
- #include "chrome/browser/ui/views/tabs/vertical/vertical_tab_strip_bottom_container.h"
- #include "chrome/browser/ui/web_applications/app_browser_controller.h"
-""",
-            "native tab bridge include context",
-        ),
+    contents = replace_hunk_sequence_exactly_once(
+        contents,
         (
             "@@ -777,6 +757,13 @@ "
             "void VerticalTabStripRegionView::UpdateL",
-            """@@ -710,5 +690,16 @@ void VerticalTabStripRegionView::OnResize(
-     InvalidateLayout();
+            "@@ -811,6 +798,13 @@ "
+            "const tabs::TabData& VerticalTabStripReg",
+            "@@ -939,6 +933,9 @@ "
+            "void VerticalTabStripRegionView::SetTabS",
+        ),
+        """@@ -711,15 +691,44 @@ void VerticalTabStripRegionView::OnResize(
    }
  }
 <CONTEXT-BLANK>
@@ -361,13 +392,6 @@ def repair_native_tab_bridge(contents: str) -> str:
 +}
 +
  void VerticalTabStripRegionView::SetCollapsedStateUpdatedCallback(
-""",
-            "GetFocusedTabIndex base-class relocation",
-        ),
-        (
-            "@@ -811,6 +798,13 @@ "
-            "const tabs::TabData& VerticalTabStripReg",
-            """@@ -715,5 +706,16 @@ void VerticalTabStripRegionView::SetCollapsedStateUpdatedCallback(
      base::RepeatingCallback<void(bool)> callback) {
    update_state_controller_collapsed_callback_ = std::move(callback);
  }
@@ -384,13 +408,6 @@ def repair_native_tab_bridge(contents: str) -> str:
 +}
 +
  bool VerticalTabStripRegionView::IsCollapsing() {
-""",
-            "GetTabAnchorViewAt base-class relocation",
-        ),
-        (
-            "@@ -939,6 +933,9 @@ "
-            "void VerticalTabStripRegionView::SetTabS",
-            """@@ -720,6 +723,13 @@ bool VerticalTabStripRegionView::IsCollapsing() {
    return BrowserAnimationController::From(browser_view_->browser())
               ->GetCurrentMotion(TabStripAnimations::kVerticalTabStrip) ==
           TabStripAnimations::kCollapse;
@@ -403,9 +420,23 @@ def repair_native_tab_bridge(contents: str) -> str:
 +  return BaseTabStripRegionView::GetTabStripView();
 +}
 +
- void VerticalTabStripRegionView::RequestCollapse(bool collapse) {
+ void VerticalTabStripRegionView::RequestCollapse(bool collapse) {""",
+        "native tab bridge base-class method relocation",
+    )
+
+    hunks = (
+        (
+            "@@ -42,6 +42,7 @@",
+            """@@ -49,6 +49,7 @@
+ #include "chrome/browser/ui/views/tabs/common/tab_strip_view.h"
+ #include "chrome/browser/ui/views/tabs/common/tab_view.h"
+ #include "chrome/browser/ui/views/tabs/common/unpinned_tab_container_view.h"
+ #include "chrome/browser/ui/views/tabs/shared/drop_arrow.h"
++#include "chrome/browser/ui/views/tabs/sidetree/sidetree_tab_strip_view.h"
+ #include "chrome/browser/ui/views/tabs/vertical/vertical_tab_strip_bottom_container.h"
+ #include "chrome/browser/ui/web_applications/app_browser_controller.h"
 """,
-            "GetTabStripView base-class relocation",
+            "native tab bridge include context",
         ),
         (
             "@@ -1107,6 +1104,8 @@ "
