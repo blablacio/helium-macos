@@ -22,7 +22,7 @@
        "//content/public/browser",
 --- a/chrome/browser/ui/BUILD.gn
 +++ b/chrome/browser/ui/BUILD.gn
-@@ -875,18 +875,9 @@ static_library("ui") {
+@@ -876,18 +876,9 @@ static_library("ui") {
      "//components/reading_list/core",
      "//components/renderer_context_menu",
      "//components/resources",
@@ -41,7 +41,7 @@
      "//components/schema_org/common:improved_mojom",
      "//components/search_engines",
      "//components/security_interstitials/content:security_interstitial_page",
-@@ -5289,7 +5280,6 @@ group("ui_public_dependencies") {
+@@ -5310,7 +5301,6 @@ group("ui_public_dependencies") {
      "//components/dom_distiller/core",
      "//components/enterprise/buildflags",
      "//components/paint_preview/buildflags",

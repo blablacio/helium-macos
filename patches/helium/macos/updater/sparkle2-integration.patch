@@ -176,7 +176,7 @@
  import("//components/captive_portal/core/features.gni")
  import("//components/compose/features.gni")
  import("//components/enterprise/buildflags/buildflags.gni")
-@@ -3483,6 +3484,10 @@ static_library("ui") {
+@@ -3484,6 +3485,10 @@ static_library("ui") {
        "views/helium/native_frame_materials_mac.mm",
      ]
  

@@ -6,3 +6,8 @@ UNGOOGLED_REPO=$PLATFORM_ROOT/helium-chromium
 _command=$1
 
 $UNGOOGLED_REPO/devutils/update_platform_patches.py $_command $PLATFORM_ROOT/patches
+
+if [[ "$_command" == "merge" ]]; then
+    python3 "$PLATFORM_ROOT/devutils/repair_sidetree_patches.py" \
+        "$PLATFORM_ROOT/patches"
+fi
