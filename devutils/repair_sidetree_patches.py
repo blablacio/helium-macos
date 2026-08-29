@@ -298,6 +298,19 @@ def repair_native_tab_polish(contents: str) -> str:
 
 
 def repair_native_tab_tree(contents: str) -> str:
+    legacy_profile_calls = contents.count("->profile()")
+    current_profile_calls = contents.count("->GetProfile()")
+    if legacy_profile_calls == 65 and current_profile_calls == 4:
+        # Chromium 152 renamed Browser::profile() to Browser::GetProfile().
+        # Every legacy call in this SideTree patch is on an added source line.
+        contents = contents.replace("->profile()", "->GetProfile()")
+    elif legacy_profile_calls != 0 or current_profile_calls != 69:
+        raise RuntimeError(
+            "cannot repair SideTree Browser profile accessors: "
+            f"found {legacy_profile_calls} legacy and "
+            f"{current_profile_calls} current calls"
+        )
+
     if has_complete_repair(
         contents,
         (
