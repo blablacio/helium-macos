@@ -12,5 +12,8 @@ is_debug=false
 is_official_build=true
 proprietary_codecs=true
 symbol_level=1
+# Xcode 27 SDK TAPI files use arm64e.x1 targets unsupported by bundled LLD 24.
+# Use Apple's linker until Chromium's prebuilt LLD supports those targets.
+use_lld=false
 use_sysroot=false
 use_siso=true
